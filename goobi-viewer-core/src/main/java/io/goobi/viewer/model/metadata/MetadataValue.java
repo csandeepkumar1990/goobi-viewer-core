@@ -30,6 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -196,6 +198,39 @@ public class MetadataValue implements Serializable {
             if (addSuffix && paramSuffixes.size() > index && StringUtils.isNotEmpty(paramSuffixes.get(index))) {
                 sb.append(paramSuffixes.get(index));
             }
+        }
+        if (index == 0 && StringUtils.contains(sb.toString(), "gndid")) {
+            logger.info("0 th index");
+            // Pattern pattern = Pattern.compile("lastname:\\s*(\\w+)\\s+firstname:\\s*([\\w\\s]+)\\s+gndid:\\s*(\\d+)]");
+            Pattern pattern = Pattern.compile("lastname:\\s*(\\w+)\\s+firstname:\\s*([\\w\\s]+)\\s+gndid:\\s*(\\d+)\\s+role:\\s*([\\w\\s]+)]");
+
+            // Match the pattern against the input string
+            Matcher matcher = pattern.matcher(sb.toString());
+
+            if (matcher.find()) {
+                logger.info("Matcher");
+                // Extract values using group indices
+                String lastName = matcher.group(1);
+                String firstName = matcher.group(2);
+                int gndId = Integer.parseInt(matcher.group(3));
+                String roleName = matcher.group(4);
+
+                String fullName = roleName + ": " + lastName + ", " + firstName;
+
+                StringBuilder sbUrl = new StringBuilder();
+                sbUrl.append("<a href=\"https://d-nb.info/gnd/").append(gndId).append("\">");
+                sbUrl.append("<img alt=\"gndico2\" src=\"").append("/viewer/resources/images/gndico32.png").append("\"/>");
+                sbUrl.append("</a>");
+
+                return fullName + " " + sbUrl.toString();
+            } else {
+                // Debugging: Print if the pattern was not found
+                logger.info("Matcher Pattern not found in the input string.");
+                StringBuilder sbUrl = new StringBuilder();
+                sbUrl.append("<img alt=\"gndico2\" src=\"").append("/viewer/resources/images/gndico32.png").append("\"/>");
+                sb.append(sbUrl.toString());
+            }
+
         }
 
         return sb.toString();

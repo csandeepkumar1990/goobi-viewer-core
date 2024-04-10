@@ -11,6 +11,12 @@
 	<composite:interface />
 
 	<composite:implementation>
+		<style>
+			[data-original-title="Wikipedia"] {
+				display: none!important;
+			}
+		</style>
+
 		<h:panelGroup rendered="#{metadataBean.getBottomMetadataElement(0).hasSidebarMetadata and not (activeDocumentBean.anchor or activeDocumentBean.group)}">
 
                 <!-- SIDEBAR METADATA -->
